@@ -1,0 +1,12 @@
+{
+  "title": "Documentation",
+  "pages": [
+    "index",
+    "getting-started",
+    "triggers",
+    "visual-editor",
+    "reference",
+    "configuration", 
+    "troubleshooting"
+  ]
+}
