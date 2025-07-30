@@ -17,7 +17,13 @@ export const baseOptions: BaseLayoutProps = {
           xmlns="http://www.w3.org/2000/svg"
           aria-label="Logo"
         >
-          <circle cx={12} cy={12} r={12} fill="currentColor" />
+          <defs>
+            <linearGradient id="operion-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#2563eb" />
+              <stop offset="100%" stopColor="#9333ea" />
+            </linearGradient>
+          </defs>
+          <circle cx={12} cy={12} r={12} fill="url(#operion-gradient)" />
         </svg>
         
         Operion
