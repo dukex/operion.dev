@@ -1,13 +1,43 @@
 ---
-title: Hello World
-description: Your first document
+title: Welcome to Operion
+description: A powerful workflow automation platform for event-driven applications
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+Welcome to Operion documentation! Operion is a comprehensive workflow automation platform that enables you to build, deploy, and manage event-driven workflows with ease.
 
-## What is Next?
+## What is Operion?
+
+Operion provides a complete solution for workflow automation, offering:
+
+- **Event-Driven Architecture**: React to events from Kafka, message queues, and other sources
+- **Visual Workflow Editor**: Design complex workflows using an intuitive drag-and-drop interface
+- **Production-Ready Deployment**: Deploy with Docker or Kubernetes with built-in observability
+- **Flexible Triggers**: Support for various trigger types including Kafka, queues, and custom triggers
+
+## Getting Started
 
 <Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.vercel.app" />
+  <Card title="Installation" href="/docs/getting-started/operators/installation" />
+  <Card title="First Workflow" href="/docs/getting-started/developers/first-workflow" />
+  <Card title="Visual Editor" href="/docs/visual-editor" />
+  <Card title="API Reference" href="/docs/reference/api" />
 </Cards>
+
+## Core Concepts
+
+### Triggers
+Triggers are the entry points for your workflows. Operion supports various trigger types:
+
+- [Kafka Trigger](/docs/triggers/kafka-trigger) - React to Kafka messages
+- [Queue Trigger](/docs/triggers/queue-trigger) - Process messages from queues
+- [Custom Triggers](/docs/triggers/trigger-service) - Build your own trigger types
+
+### Workflows
+Workflows define the business logic and processing steps for your automation. Use the [Visual Editor](/docs/visual-editor) to design workflows or write them in code.
+
+## Quick Links
+
+- [Configuration](/docs/configuration/environment-variables)
+- [Deployment Guides](/docs/getting-started/operators/)
+- [Troubleshooting](/docs/troubleshooting/common-issues)
+- [How-to Guides](/docs/how-to/)
