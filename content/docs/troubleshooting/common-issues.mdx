@@ -389,8 +389,8 @@ func main() {
 "{{.env.API_KEY}}"
 
 # ❌ Wrong: Old variable access (will not work)
-"{{.variables.api_key}}"    # Should be .vars.api_key
-"{{variables.api_key}}"     # Missing dot prefix
+"{{.vars.api_key}}"         # Correct: use .vars instead of .variables
+"{{.vars.api_key}}"         # Correct: include dot prefix
 
 # Debug template context - add temporary debug step:
 {

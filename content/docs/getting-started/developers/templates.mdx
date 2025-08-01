@@ -111,22 +111,14 @@ Access workflow variables and environment variables:
 ### String Operations
 
 ```json
-// String manipulation with built-in functions
-"{{.user.name | upper}}"                 // Convert to uppercase (custom function needed)
-"{{.user.email | lower}}"                // Convert to lowercase (custom function needed)
-
 // String concatenation
 "{{.user.firstName}} {{.user.lastName}}"
-"{{range .tags}}{{.}}{{if not (last .)}} {{end}}{{end}}"  // Join array
+"{{range $i, $tag := .tags}}{{if $i}} {{end}}{{$tag}}{{end}}"  // Join array with spaces
 ```
 
 ### Number Operations
 
 ```json
-// Math operations (requires custom functions)
-"{{mul .price 1.1}}"                     // Multiplication
-"{{add .total .shipping_cost}}"          // Addition
-
 // Built-in comparisons
 "{{if gt .price 100}}Expensive{{else}}Affordable{{end}}"
 ```
@@ -165,8 +157,8 @@ Templates use `if/else` statements for conditionals:
 // Array transformation with range
 "[{{range $i, $user := .users}}{{if $i}}, {{end}}{\"id\": {{.id}}, \"name\": \"{{.firstName}} {{.lastName}}\", \"contact\": \"{{.email}}\"}{{end}}]"
 
-// Filtering with conditionals
-"[{{$first := true}}{{range .products}}{{if gt .price 50}}{{if not $first}}, {{end}}{\"name\": \"{{.name}}\", \"discountedPrice\": {{mul .price 0.9}}}{{$first = false}}{{end}}{{end}}]"
+// Filtering with conditionals (math operations would need to be calculated elsewhere)
+"[{{$first := true}}{{range .products}}{{if gt .price 50}}{{if not $first}}, {{end}}{\"name\": \"{{.name}}\", \"originalPrice\": {{.price}}}{{$first = false}}{{end}}{{end}}]"
 
 // Simple counting
 "{{len .items}}"
@@ -183,7 +175,7 @@ For complex object construction, it's better to use the transform action:
   "id": "transform-user-data",
   "action": "transform",
   "config": {
-    "expression": "{\"id\": {{.id}}, \"profile\": {\"fullName\": \"{{.name}}\", \"email\": \"{{.email}}\", \"phone\": \"{{.phone}}\", \"company\": \"{{.company.name}}\", \"role\": \"{{.company.catchPhrase}}\"}, \"address\": {\"street\": \"{{.address.street}}\", \"city\": \"{{.address.city}}\", \"zipcode\": \"{{.address.zipcode}}\", \"coordinates\": {\"lat\": {{.address.geo.lat}}, \"lng\": {{.address.geo.lng}}}}, \"metadata\": {\"processedAt\": \"{{now}}\", \"source\": \"api\"}}",
+    "expression": "{\"id\": {{.id}}, \"profile\": {\"fullName\": \"{{.name}}\", \"email\": \"{{.email}}\", \"phone\": \"{{.phone}}\", \"company\": \"{{.company.name}}\", \"role\": \"{{.company.catchPhrase}}\"}, \"address\": {\"street\": \"{{.address.street}}\", \"city\": \"{{.address.city}}\", \"zipcode\": \"{{.address.zipcode}}\", \"coordinates\": {\"lat\": {{.address.geo.lat}}, \"lng\": {{.address.geo.lng}}}}, \"metadata\": {\"processedAt\": \"{{.execution.timestamp}}\", \"source\": \"api\"}}",
     "input": "steps.fetch_user.body"
   }
 }
@@ -191,7 +183,7 @@ For complex object construction, it's better to use the transform action:
 
 ### Template functions
 
-Templates support built-in functions:
+Templates support these built-in functions:
 
 ```json
 // Comparison functions
@@ -224,7 +216,7 @@ Transform external API responses into your required format:
   "id": "transform-user-data",
   "action": "transform",
   "config": {
-    "expression": "{\"id\": {{.id}}, \"profile\": {\"fullName\": \"{{.name}}\", \"email\": \"{{.email}}\", \"phone\": \"{{.phone}}\", \"company\": \"{{.company.name}}\", \"role\": \"{{.company.catchPhrase}}\"}, \"address\": {\"street\": \"{{.address.street}}\", \"city\": \"{{.address.city}}\", \"zipcode\": \"{{.address.zipcode}}\", \"coordinates\": {\"lat\": {{.address.geo.lat}}, \"lng\": {{.address.geo.lng}}}}, \"metadata\": {\"processedAt\": \"{{now}}\", \"source\": \"api\"}}",
+    "expression": "{\"id\": {{.id}}, \"profile\": {\"fullName\": \"{{.name}}\", \"email\": \"{{.email}}\", \"phone\": \"{{.phone}}\", \"company\": \"{{.company.name}}\", \"role\": \"{{.company.catchPhrase}}\"}, \"address\": {\"street\": \"{{.address.street}}\", \"city\": \"{{.address.city}}\", \"zipcode\": \"{{.address.zipcode}}\", \"coordinates\": {\"lat\": {{.address.geo.lat}}, \"lng\": {{.address.geo.lng}}}}, \"metadata\": {\"processedAt\": \"{{.execution.timestamp}}\", \"source\": \"api\"}}",
     "input": "steps.fetch_user.body"
   }
 }
@@ -393,10 +385,6 @@ For large data processing, consider breaking into multiple transform steps rathe
 ### 2. Type Handling
 
 ```json
-// Problem: Template functions expect specific types
-"{{add .user.age 1}}"  // Fails if age is string
-
-// Solution: Templates auto-convert in most contexts, but be careful with comparisons
 "{{if gt .user.age \"18\"}}Adult{{else}}Minor{{end}}"
 ```
 
