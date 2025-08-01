@@ -1,5 +1,5 @@
 ---
-title: Common Issues and Troubleshooting
+title: Common issues
 description: Comprehensive troubleshooting guide for resolving common Operion deployment and runtime issues
 ---
 
@@ -21,7 +21,7 @@ lsof -i :3000
 netstat -tulpn | grep :3000
 
 # Check service logs
-./bin/operion-api run
+./bin/operion-api
 # or
 journalctl -u operion-api -f
 
@@ -39,7 +39,7 @@ sudo kill $(lsof -t -i:3000)
 
 # Or change the port
 export PORT=3001
-./bin/operion-api run
+./bin/operion-api
 ```
 
 **Permission errors:**
@@ -253,7 +253,7 @@ journalctl -u operion-worker -f
 journalctl -u operion-dispatcher -f
 
 # Test workflow manually
-curl -X POST http://localhost:3000/workflows \
+curl -X POST http://localhost:9091/workflows \
   -H "Content-Type: application/json" \
   -d @examples/data/workflows/simple-http-request.json
 ```
@@ -266,7 +266,7 @@ curl -X POST http://localhost:3000/workflows \
 ./bin/operion-worker &
 
 # Check worker registration
-curl http://localhost:3000/health
+curl http://localhost:9091/health
 ```
 
 **Event bus not connected:**
@@ -279,10 +279,10 @@ export KAFKA_BROKERS=localhost:9092
 **Trigger issues:**
 ```bash
 # Check trigger service (uses WEBHOOK_PORT, default 8085)
-./bin/operion-dispatcher run &
+./bin/operion-dispatcher &
 
 # Verify trigger configuration
-curl http://localhost:8085/registry/triggers
+curl http://localhost:9091/registry/triggers
 ```
 
 ### Workflow Timeout Issues
@@ -326,15 +326,77 @@ nslookup target-api.com
 
 **Transform Action Issues:**
 ```bash
-# Test JSONata expression
-node -e "const jsonata = require('jsonata'); console.log(jsonata('$.name').evaluate({name: 'test'}))"
+# Test Go template expression
+go run -c 'package main
+import ("text/template"; "os"; "strings")
+func main() {
+  tmpl := template.Must(template.New("test").Parse("{{.name}}"))
+  data := map[string]any{"name": "test"}
+  var buf strings.Builder
+  tmpl.Execute(&buf, data)
+  println(buf.String())
+}'
 
 # Validate input data
 {
   "action": "transform",
   "config": {
-    "expression": "$.name",
-    "input": "{{steps.previous_step.result}}"
+    "expression": "{{.name}}",
+    "input": "steps.previous_step.result"
+  }
+}
+```
+
+**Template Context Issues:**
+
+**Symptoms:**
+- Template fields not found errors
+- Variables not accessible in templates
+- Environment variables not available
+
+**Common template context structure:**
+```json
+{
+  "steps": {},      // Results from previous workflow steps
+  "vars": {},       // Workflow variables (note: 'vars', not 'variables')
+  "trigger": {},    // Data from the trigger that started the workflow
+  "metadata": {},   // Workflow execution metadata
+  "env": {},        // Environment variables
+  "execution": {    // Execution context
+    "id": "",
+    "workflow_id": ""
+  }
+}
+```
+
+**Solutions:**
+```bash
+# Common template access patterns:
+# ✅ Correct: Access workflow variables
+"{{.vars.api_key}}"
+"{{.vars.config.timeout}}"
+
+# ✅ Correct: Access step results
+"{{.steps.fetch_user.body.name}}"
+"{{.steps.previous_step.result}}"
+
+# ✅ Correct: Access trigger data
+"{{.trigger.kafka.message}}"
+"{{.trigger.schedule.timestamp}}"
+
+# ✅ Correct: Access environment variables
+"{{.env.DATABASE_URL}}"
+"{{.env.API_KEY}}"
+
+# ❌ Wrong: Old variable access (will not work)
+"{{.variables.api_key}}"    # Should be .vars.api_key
+"{{variables.api_key}}"     # Missing dot prefix
+
+# Debug template context - add temporary debug step:
+{
+  "action": "log",
+  "config": {
+    "message": "Context: steps={{.steps}}, vars={{.vars}}, trigger={{.trigger}}"
   }
 }
 ```
@@ -428,8 +490,8 @@ vmstat 1 5
 # Consult your Operion version documentation for specific variables
 
 # Use multiple workers instead of single worker scaling
-./bin/operion-worker run --worker-id worker-01 &
-./bin/operion-worker run --worker-id worker-02 &
+./bin/operion-worker --worker-id worker-01 &
+./bin/operion-worker --worker-id worker-02 &
 
 # Enable garbage collection tuning (Go runtime)
 export GOGC=50
@@ -460,9 +522,9 @@ ps aux | grep operion | awk '{print $3, $4, $11}'
 # Add indexes to frequently queried columns in DATABASE_URL database
 
 # Scale horizontally - run multiple worker instances
-./bin/operion-worker run --worker-id worker-01 &
-./bin/operion-worker run --worker-id worker-02 &
-./bin/operion-worker run --worker-id worker-03 &
+./bin/operion-worker --worker-id worker-01 &
+./bin/operion-worker --worker-id worker-02 &
+./bin/operion-worker --worker-id worker-03 &
 ```
 
 ### Slow Workflow Execution
@@ -471,7 +533,7 @@ ps aux | grep operion | awk '{print $3, $4, $11}'
 ```bash
 # Enable debug logging
 export LOG_LEVEL=debug
-./bin/operion-worker run
+./bin/operion-worker
 
 # Check step execution times
 # Review workflow logs for bottlenecks
@@ -559,18 +621,18 @@ curl http://$(hostname -I | awk '{print $1}'):9091/health
 export LOG_LEVEL=debug
 
 # Start services with debug logging
-./bin/operion-api run
-./bin/operion-worker run
-./bin/operion-dispatcher run
+./bin/operion-api
+./bin/operion-worker
+./bin/operion-dispatcher
 ```
 
 ### Log Analysis
 
 ```bash
 # Follow logs in real-time (services log to stdout/stderr)
-./bin/operion-api run | tee api.log &
-./bin/operion-worker run | tee worker.log &
-./bin/operion-dispatcher run | tee dispatcher.log &
+./bin/operion-api | tee api.log &
+./bin/operion-worker | tee worker.log &
+./bin/operion-dispatcher | tee dispatcher.log &
 
 # Or use journalctl if running as systemd services
 journalctl -u operion-api -f

@@ -13,7 +13,7 @@ Each Operion service requires specific environment variables for proper operatio
 
 ### API Server (operion-api)
 
-Command: `./bin/operion-api run`
+Command: `./bin/operion-api`
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -27,7 +27,7 @@ Command: `./bin/operion-api run`
 
 ### Worker Service (operion-worker)
 
-Command: `./bin/operion-worker run`
+Command: `./bin/operion-worker`
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -39,7 +39,7 @@ Command: `./bin/operion-worker run`
 
 ### Dispatcher Service (operion-dispatcher)
 
-Command: `./bin/operion-dispatcher run`
+Command: `./bin/operion-dispatcher`
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -60,9 +60,6 @@ DATABASE_URL=postgresql://user:password@localhost:5432/operion?sslmode=require
 
 # File-based persistence (JSON)
 DATABASE_URL=file://./data/workflows.json
-
-# MySQL (if supported)
-DATABASE_URL=mysql://user:password@localhost:3306/operion?parseTime=true
 ```
 
 ## Usage Examples
@@ -73,10 +70,10 @@ DATABASE_URL=mysql://user:password@localhost:3306/operion?parseTime=true
 export DATABASE_URL="postgresql://user:password@localhost:5432/operion"
 export EVENT_BUS_TYPE="kafka"
 export LOG_LEVEL="debug"
-./bin/operion-api run
+./bin/operion-api
 
 # Using command-line flags
-./bin/operion-api run --port 8080 --database-url "file://./data.json" --event-bus "kafka" --log-level "debug"
+./bin/operion-api --port 8080 --database-url "postgresql://user:password@localhost:5432/operion" --event-bus "kafka" --log-level "debug"
 ```
 
 ### Start Worker
@@ -85,10 +82,10 @@ export LOG_LEVEL="debug"
 export DATABASE_URL="postgresql://user:password@localhost:5432/operion"
 export EVENT_BUS_TYPE="kafka" 
 export WORKER_ID="worker-01"
-./bin/operion-worker run
+./bin/operion-worker
 
 # Using command-line flags
-./bin/operion-worker run --worker-id "worker-01" --database-url "file://./data.json" --event-bus "kafka"
+./bin/operion-worker --worker-id "worker-01" --database-url "postgresql://user:password@localhost:5432/operion" --event-bus "kafka"
 ```
 
 ### Start Dispatcher
@@ -97,10 +94,10 @@ export WORKER_ID="worker-01"
 export DATABASE_URL="postgresql://user:password@localhost:5432/operion"
 export EVENT_BUS_TYPE="kafka"
 export WEBHOOK_PORT="8085"
-./bin/operion-dispatcher run
+./bin/operion-dispatcher
 
 # Using command-line flags
-./bin/operion-dispatcher run --webhook-port 8085 --database-url "file://./data.json" --event-bus "kafka"
+./bin/operion-dispatcher --webhook-port 8085 --database-url "postgresql://user:password@localhost:5432/operion" --event-bus "kafka"
 ```
 
 ## Configuration Validation

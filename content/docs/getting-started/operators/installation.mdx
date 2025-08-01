@@ -1,5 +1,5 @@
 ---
-title: Installation Guide
+title: Installation guide
 description: Step-by-step guide to install Operion from source and set up your workflow automation platform
 ---
 
@@ -84,21 +84,21 @@ Start the services in the following order:
 **Terminal 1 - API Server:**
 ```bash
 export KAFKA_BROKERS=localhost:9092
-./bin/operion-api run --port 8099 --database-url file://./examples/data --event-bus kafka
+./bin/operion-api --port 8099 --database-url file://./examples/data --event-bus kafka
 ```
 The API server will start on port 8099 as specified.
 
 **Terminal 2 - Dispatcher Service:**
 ```bash
 export KAFKA_BROKERS=localhost:9092
-./bin/operion-dispatcher run --database-url file://./examples/data --event-bus kafka
+./bin/operion-dispatcher --database-url file://./examples/data --event-bus kafka
 ```
 This service listens for triggers and publishes events to the `operion.events` Kafka topic.
 
 **Terminal 3 - Worker Service:**
 ```bash
 export KAFKA_BROKERS=localhost:9092
-./bin/operion-worker run --database-url file://./examples/data --event-bus kafka
+./bin/operion-worker --database-url file://./examples/data --event-bus kafka
 ```
 This service executes workflows when events are received from the `operion.events` Kafka topic.
 
@@ -141,7 +141,6 @@ operion/
 │   ├── operion-api
 │   ├── operion-worker
 │   └── operion-dispatcher
-├── config/                 # Configuration files
 ├── data/
 │   └── workflows/          # Workflow storage
 ├── plugins/                # Plugin .so files
